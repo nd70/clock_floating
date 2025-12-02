@@ -254,6 +254,7 @@ local function safe_hl_name(dchar)
 end
 
 -- apply per-cell highlights only for '█' characters (robust, no utf8.offset)
+-- Replace your apply_digit_highlights with this version
 local function apply_digit_highlights(buf, lines, cfg, time_str)
 	if not buf or not vim.api.nvim_buf_is_valid(buf) then
 		return
@@ -266,22 +267,11 @@ local function apply_digit_highlights(buf, lines, cfg, time_str)
 	local sep = 1
 	local pad = cfg.padding
 
-	-- sample the first line to detect which character corresponds to each block index
-	local first = lines[1] or ""
+	-- Use time_str directly (exact mapping) rather than sampling the first line.
+	-- time_str should be like "HH:MM:SS" and its length equals number of blocks.
 	local timechars = {}
-	for i = 1, math.ceil(#first / (block_width + sep)) do
-		local start_col = pad + (i - 1) * (block_width + sep)
-		local sample_col = start_col + math.floor(block_width / 2)
-		local found_ch = " "
-		for bpos = 1, #first do
-			local prefix = first:sub(1, bpos - 1)
-			local d = vim.fn.strdisplaywidth(prefix)
-			if d == sample_col or d == sample_col - 1 then
-				found_ch = first:sub(bpos, bpos)
-				break
-			end
-		end
-		timechars[#timechars + 1] = found_ch
+	for i = 1, #time_str do
+		timechars[i] = time_str:sub(i, i)
 	end
 
 	-- iterate rows and locate each '█' and highlight that single cell
