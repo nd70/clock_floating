@@ -477,7 +477,7 @@ local function render_once()
 		return
 	end
 
-	local timestr = os.date("%I:%M:%S %p")
+	local timestr = os.date("%I:%M:%S")
 	local lines = build_clock_lines(timestr, cfg)
 	local main_cfg = make_center_config(lines, cfg)
 	main_cfg.winblend = cfg.winblend
