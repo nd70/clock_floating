@@ -156,9 +156,9 @@ end
 local function create_digit_highlights()
 	for ch, hex in pairs(DIGIT_COLOR) do
 		local name = (ch == ":" and "ClockFloatingDigitColon") or ("ClockFloatingDigit" .. ch)
-		pcall(vim.api.nvim_set_hl, 0, name, { fg = hex, bg = hex })
+		pcall(vim.api.nvim_set_hl, 0, name, { fg = hex, bg = "NONE" })
 	end
-	pcall(vim.api.nvim_set_hl, 0, "ClockFloatingMain", { fg = state.cfg.fg, bg = hex })
+	pcall(vim.api.nvim_set_hl, 0, "ClockFloatingMain", { fg = state.cfg.fg, bg = "NONE" })
 end
 
 local function hscale_row(row, scale)
@@ -232,6 +232,23 @@ local function make_buf()
 	return buf
 end
 
+local function _safe_hl_name(dchar)
+	if dchar == ":" then
+		return "ClockFloatingDigitColon"
+	end
+	if dchar:match("^%d$") then
+		return "ClockFloatingDigit" .. dchar
+	end
+	if dchar == " " then
+		return "ClockFloatingDigitSpace"
+	end
+	local s = (dchar or ""):gsub("%W", "_")
+	if s == "" then
+		s = "Unknown"
+	end
+	return "ClockFloatingDigit" .. s
+end
+
 -- apply per-cell highlights only for '█' characters, mapping each cell to its digit's color
 local function apply_digit_highlights(buf, lines, cfg, time_str)
 	if not buf or not vim.api.nvim_buf_is_valid(buf) then
@@ -274,8 +291,7 @@ local function apply_digit_highlights(buf, lines, cfg, time_str)
 					-- cell is inside the block for digit at block_index
 					if ch == "█" then
 						local digit_char = time_str:sub(block_index, block_index)
-						local hl = (digit_char == ":" and "ClockFloatingDigitColon")
-							or ("ClockFloatingDigit" .. digit_char)
+						local hl = _safe_hl_name(digit_char)
 						safe_call(function()
 							-- highlight the single cell [col, col+1)
 							vim.api.nvim_buf_add_highlight(buf, ns, hl, line_idx - 1, col, col + 1)
