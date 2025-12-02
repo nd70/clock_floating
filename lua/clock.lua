@@ -1,14 +1,8 @@
--- lua/clock/nvim.lua
--- clock.nvim - large floating ASCII clock with left→right gradient, optional Kanagawa colors.
--- Usage:
---   require("clock.nvim").setup({ map = true, gradient = { from = "#17A1D4", to = "#F5A623" } })
---   <leader>ck toggles the clock (default)
-
 local M = {}
 
 -- DEFAULTS
 local DEFAULTS = {
-	cmd = "ClockNvimToggle",
+	cmd = "ClockToggle",
 	map = true,
 	padding = 1,
 	scale = 1,
@@ -17,7 +11,7 @@ local DEFAULTS = {
 	border = "none",
 	min_cols = 20,
 	min_rows = 6,
-	-- default gradient (the one you liked)
+	-- default gradient
 	gradient = { from = "#17A1D4", to = "#F5A623" },
 	-- if true, attempt to derive endpoints from Kanagawa colorscheme (dragon)
 	prefer_kanagawa = false,
@@ -655,20 +649,21 @@ function M.setup(user_cfg)
 		pcall(function()
 			vim.api.nvim_create_user_command(state.cfg.cmd, function()
 				M.toggle()
-			end, { desc = "Toggle ClockNvim" })
+			end, { desc = "Toggle Clock" })
 		end)
 	end
-	-- keymap (if desired)
-	if state.cfg.map ~= false then
-		local existing = vim.fn.maparg("<leader>ck", "n")
-		if existing == "" then
-			pcall(function()
-				vim.keymap.set("n", "<leader>ck", function()
-					M.toggle()
-				end, { desc = "Toggle clock.nvim", silent = true })
-			end)
-		end
-	end
+	--
+	-- -- keymap (if desired)
+	-- if state.cfg.map ~= false then
+	-- 	local existing = vim.fn.maparg("<leader>ck", "n")
+	-- 	if existing == "" then
+	-- 		pcall(function()
+	-- 			vim.keymap.set("n", "<leader>ck", function()
+	-- 				M.toggle()
+	-- 			end, { desc = "Toggle clock.nvim", silent = true })
+	-- 		end)
+	-- 	end
+	-- end
 end
 
 return M
