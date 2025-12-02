@@ -1,1 +1,1 @@
-# clock_floating
+# basic clock
